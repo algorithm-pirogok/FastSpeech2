@@ -43,7 +43,7 @@ class FastSpeech2(BaseModel):
             output = self.decoder(output + pitch_output + energy_output, mel_pos)
             output = self.mask_tensor(output, mel_pos, mel_max_length)
         else:
-            output = self.decoder(output + pitch_output + energy_output, mel_pos)
+            output = self.decoder(output + pitch_output + energy_output, duration_predictor_output)
 
         output = self.mel_linear(output)
         return {"output": output,
