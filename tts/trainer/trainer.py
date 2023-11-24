@@ -127,7 +127,7 @@ class Trainer(BaseTrainer):
                     )
                     # self._log_predictions(is_validation=False, **batch)
                     # todo add log audio
-                    self._log(batch['mel_target'], batch['mel_pred'])
+                    self._log(batch['mel_target'], batch['output'])
                     self._log_scalars(self.train_metrics)
                     last_train_metrics = self.train_metrics.result()
                     self.train_metrics.reset()
