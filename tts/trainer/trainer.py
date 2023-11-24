@@ -147,7 +147,6 @@ class Trainer(BaseTrainer):
             batch['energy_target'], batch['pitch_target'])
 
         batch["loss"] = (mel_loss + duration_predictor_loss + energy_predictor_loss + pitch_predictor_loss) / 4
-        batch["loss"] = mel_loss
         batch["mel_loss"] = mel_loss
         batch["duration_predictor_loss"] = duration_predictor_loss
         batch["energy_predictor_loss"] = energy_predictor_loss
