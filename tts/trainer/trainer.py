@@ -151,10 +151,10 @@ class Trainer(BaseTrainer):
             batch["logits"] = outputs
 
         mel_loss, duration_predictor_loss, energy_predictor_loss, pitch_predictor_loss = self.criterion(
-                                       batch['output'], batch['duration_pred'],
-                                       batch['energy_pred'], batch['pitch_pred'],
-                                       batch['mel_target'], batch['length_target'],
-                                       batch['energy_target'], batch['pitch_target'])
+            batch['output'], batch['duration_pred'],
+            batch['energy_pred'], batch['pitch_pred'],
+            batch['mel_target'], batch['length_target'],
+            batch['energy_target'], batch['pitch_target'])
         batch["loss"] = (mel_loss + duration_predictor_loss + energy_predictor_loss + pitch_predictor_loss) / 4
         batch["mel_loss"] = mel_loss
         batch["duration_predictor_loss"] = duration_predictor_loss
@@ -225,7 +225,6 @@ class Trainer(BaseTrainer):
         return base.format(current, total, 100.0 * current / total)
 
     # def _log(self, batch):
-
 
     def _log_spectrogram(self, spectrogram_batch):
         spectrogram = random.choice(spectrogram_batch.cpu())
