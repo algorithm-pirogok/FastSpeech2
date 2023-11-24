@@ -116,6 +116,7 @@ class Trainer(BaseTrainer):
                 if not (batch_idx + 1) % self.config['trainer']['batch_acum']:
                     self.train_metrics.update("grad norm", self.get_grad_norm())
                 if batch_idx % self.log_step == 0:
+                    print("BATCH_IDX", batch_idx)
                     self.writer.set_step((epoch - 1) * self.len_epoch + batch_idx)
                     self.logger.debug(
                         "Train Epoch: {} {} Loss: {:.6f}".format(
@@ -126,8 +127,8 @@ class Trainer(BaseTrainer):
                         "learning rate", self.optimizer.param_groups[0]['lr']
                     )
                     # self._log_predictions(is_validation=False, **batch)
-                    # todo add log audio
-                    self._log(batch['mel_target'], batch['output'])
+                    self._log(batch['mel_target'], 'target')
+                    self._log(batch['output'], 'prediction')
                     self._log_scalars(self.train_metrics)
                     last_train_metrics = self.train_metrics.result()
                     self.train_metrics.reset()
@@ -224,28 +225,14 @@ class Trainer(BaseTrainer):
             total = self.len_epoch
         return base.format(current, total, 100.0 * current / total)
 
-    def _log(self, mel_target, mel_pred):
-        idx = np.random.choice(np.arange(len(mel_target)))
-        for mels, name in zip([mel_target, mel_pred], ["target_spec", "pred_spec"]):
-            img = PIL.Image.open(plot_spectrogram_to_buf(mels[idx].detach().cpu().numpy().T))
-            self.writer.add_image(name, ToTensor()(img))
-            audio = get_wav(mels[idx].transpose(0, 1).unsqueeze(0),
-                            self.waveglow, sampling_rate=16000)
-            self.writer.add_audio(name, audio, sample_rate=16000)
+    def _log(self, mels, name):
+        idx = np.random.choice(np.arange(len(mels)))
+        img = PIL.Image.open(plot_spectrogram_to_buf(mels[idx].detach().cpu().numpy().T))
+        self.writer.add_image(name, ToTensor()(img))
+        audio = get_wav(mels[idx].transpose(0, 1).unsqueeze(0),
+                        self.waveglow, sampling_rate=16000)
+        self.writer.add_audio(name, audio, sample_rate=16000)
 
-    def _log_spectrogram(self, spectrogram_batch):
-        spectrogram = random.choice(spectrogram_batch.cpu())
-        image = PIL.Image.open(plot_spectrogram_to_buf(spectrogram))
-        self.writer.add_image("spectrogram", ToTensor()(image))
-
-    def _log_audio(self, mixed, short, long, target, reference, sample_rate):
-        if self.writer is None:
-            return
-        self.writer.add_audio("mixed", mixed, sample_rate)
-        self.writer.add_audio("short", short, sample_rate)
-        self.writer.add_audio("long", long, sample_rate)
-        self.writer.add_audio("target", target, sample_rate)
-        self.writer.add_audio("reference", reference, sample_rate)
 
     @torch.no_grad()
     def get_grad_norm(self, norm_type=2):
@@ -265,4 +252,5 @@ class Trainer(BaseTrainer):
         if self.writer is None:
             return
         for metric_name in metric_tracker.keys():
+            print(f"{metric_name}", metric_tracker.avg(metric_name))
             self.writer.add_scalar(f"{metric_name}", metric_tracker.avg(metric_name))
