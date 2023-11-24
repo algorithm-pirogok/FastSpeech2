@@ -59,9 +59,9 @@ class Trainer(BaseTrainer):
         self.evaluation_metrics = MetricTracker(
             "loss", *[m.name for m in self._metrics_test], writer=self.writer
         )
-        self.metrics = ["mel_loss", "dur_loss", "pitch_loss", "energy_loss"]
+        self.metrics = ["loss", "mel_loss", "duration_predictor_loss", "energy_predictor_loss", "pitch_predictor_loss"]
         self.train_metrics = MetricTracker(
-            "loss", "grad norm", *self.metrics, writer=self.writer
+            "grad norm", *self.metrics, writer=self.writer
         )
 
     @staticmethod
@@ -155,6 +155,7 @@ class Trainer(BaseTrainer):
             batch['energy_pred'], batch['pitch_pred'],
             batch['mel_target'], batch['length_target'],
             batch['energy_target'], batch['pitch_target'])
+
         batch["loss"] = (mel_loss + duration_predictor_loss + energy_predictor_loss + pitch_predictor_loss) / 4
         batch["mel_loss"] = mel_loss
         batch["duration_predictor_loss"] = duration_predictor_loss
