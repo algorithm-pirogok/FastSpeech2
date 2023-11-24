@@ -37,7 +37,8 @@ class Trainer(BaseTrainer):
         super().__init__(model, criterion, metrics_train, metrics_test, optimizer, config, device)
         self.skip_oom = skip_oom
         self.config = config
-
+        # todo
+        self.waveglow = ...
         self.train_dataloader = dataloader
         if len_epoch is None:
             # epoch-based training
@@ -127,8 +128,6 @@ class Trainer(BaseTrainer):
                                     batch['ref'][0],
                                     16000)"""
                     self._log_scalars(self.train_metrics)
-                    # we don't want to reset train metrics at the start of every epoch
-                    # because we are interested in recent train metrics
                     last_train_metrics = self.train_metrics.result()
                     self.train_metrics.reset()
                 if batch_idx >= self.len_epoch:
@@ -225,6 +224,9 @@ class Trainer(BaseTrainer):
             current = batch_idx
             total = self.len_epoch
         return base.format(current, total, 100.0 * current / total)
+
+    # def _log(self, batch):
+
 
     def _log_spectrogram(self, spectrogram_batch):
         spectrogram = random.choice(spectrogram_batch.cpu())

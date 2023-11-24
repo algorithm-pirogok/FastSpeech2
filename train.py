@@ -40,13 +40,8 @@ def main(clf: DictConfig):
         model = torch.nn.DataParallel(model, device_ids=device_ids)
     # get function handles of loss and metrics
     loss_module = instantiate(clf["loss"]).to(device)
-    metrics = [
-        instantiate(metric_dict)
-        for metric_dict in clf["metrics"]
-    ]
-    metrics_test = metrics
+    metrics_test = []
     metrics_train = [
-        metric for metric in metrics if metric.train
     ]
     # build optimizer, learning rate scheduler. delete every line containing lr_scheduler for
     # disabling scheduler

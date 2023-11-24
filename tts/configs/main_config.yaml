@@ -4,11 +4,11 @@ defaults:
   - data: tts_dataset
   - loss: tts_loss
   - lr_scheduler: LRStep
-  - metrics: base_metrics
+  # - metrics: base_metrics
   - preprocessing: base_preprocessing
   - trainer: base_trainer
   - optimizer: AdamW
 
 name: base_config
-n_gpu: 1
+n_gpu: 4
 checkpoint:

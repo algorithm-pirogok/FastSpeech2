@@ -31,7 +31,7 @@ pitch_config:
   buckets: 256
   alpha: 1.0
 
-device: 'cpu'
+device: 'cuda'
 max_seq_len: 3000
 num_mels: 80
 PAD: 0
