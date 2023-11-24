@@ -148,6 +148,7 @@ class Trainer(BaseTrainer):
 
         batch["loss"] = (mel_loss + duration_predictor_loss + energy_predictor_loss + pitch_predictor_loss) / 4
         batch["mel_loss"] = mel_loss
+        batch["loss"] = mel_loss
         batch["duration_predictor_loss"] = duration_predictor_loss
         batch["energy_predictor_loss"] = energy_predictor_loss
         batch["pitch_predictor_loss"] = pitch_predictor_loss
@@ -177,8 +178,8 @@ class Trainer(BaseTrainer):
         img = PIL.Image.open(plot_spectrogram_to_buf(mels[idx].detach().cpu().numpy().T))
         self.writer.add_image(name, ToTensor()(img))
         audio = get_wav(mels[idx].transpose(0, 1).unsqueeze(0),
-                        self.waveglow, sampling_rate=16000)
-        self.writer.add_audio(name, audio, sample_rate=16000)
+                        self.waveglow, sampling_rate=22050)
+        self.writer.add_audio(name, audio, sample_rate=22050)
 
     @torch.no_grad()
     def get_grad_norm(self, norm_type=2):
