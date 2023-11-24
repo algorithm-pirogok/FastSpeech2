@@ -124,8 +124,10 @@ class Trainer(BaseTrainer):
                     self._log_scalars(self.train_metrics)
                     last_train_metrics = self.train_metrics.result()
                     self.train_metrics.reset()
-                if batch_idx >= self.len_epoch:
-                    break
+
+                    if batch_idx >= self.len_epoch:
+                        return last_train_metrics
+
         log = last_train_metrics
 
         return log
