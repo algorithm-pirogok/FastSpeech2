@@ -1,6 +1,6 @@
 batch_size: 16
 batch_expand_size: 32
-num_workers: 8
+num_workers: 4
 
 datasets:
   - _target_: tts.datasets.BufferDataset
