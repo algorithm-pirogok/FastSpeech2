@@ -13,6 +13,7 @@ from tqdm import tqdm
 from tts.base import BaseTrainer
 from tts.logger.utils import plot_spectrogram_to_buf
 from tts.utils import inf_loop, MetricTracker, ROOT_PATH
+from waveglow.inference import get_wav
 
 
 class Trainer(BaseTrainer):
@@ -30,6 +31,7 @@ class Trainer(BaseTrainer):
             config,
             device,
             dataloader,
+            glow,
             lr_scheduler=None,
             len_epoch=None,
             skip_oom=True,
@@ -38,7 +40,7 @@ class Trainer(BaseTrainer):
         self.skip_oom = skip_oom
         self.config = config
         # todo
-        self.waveglow = ...
+        self.waveglow = glow
         self.train_dataloader = dataloader
         if len_epoch is None:
             # epoch-based training
@@ -56,6 +58,10 @@ class Trainer(BaseTrainer):
         )
         self.evaluation_metrics = MetricTracker(
             "loss", *[m.name for m in self._metrics_test], writer=self.writer
+        )
+        self.metrics = ["mel_loss", "dur_loss", "pitch_loss", "energy_loss"]
+        self.train_metrics = MetricTracker(
+            "loss", "grad norm", *self.metrics, writer=self.writer
         )
 
     @staticmethod
@@ -109,7 +115,6 @@ class Trainer(BaseTrainer):
                         raise e
                 if not (batch_idx + 1) % self.config['trainer']['batch_acum']:
                     self.train_metrics.update("grad norm", self.get_grad_norm())
-                print(batch_idx)
                 if batch_idx % self.log_step == 0:
                     self.writer.set_step((epoch - 1) * self.len_epoch + batch_idx)
                     self.logger.debug(
@@ -122,12 +127,7 @@ class Trainer(BaseTrainer):
                     )
                     # self._log_predictions(is_validation=False, **batch)
                     # todo add log audio
-                    """self._log_audio(batch['mixed'][0],
-                                    batch['short'][0],
-                                    batch['long'][0],
-                                    batch['target'][0],
-                                    batch['ref'][0],
-                                    16000)"""
+                    self._log(batch['mel_target'], batch['mel_pred'])
                     self._log_scalars(self.train_metrics)
                     last_train_metrics = self.train_metrics.result()
                     self.train_metrics.reset()
@@ -224,7 +224,14 @@ class Trainer(BaseTrainer):
             total = self.len_epoch
         return base.format(current, total, 100.0 * current / total)
 
-    # def _log(self, batch):
+    def _log(self, mel_target, mel_pred):
+        idx = np.random.choice(np.arange(len(mel_target)))
+        for mels, name in zip([mel_target, mel_pred], ["target_spec", "pred_spec"]):
+            img = PIL.Image.open(plot_spectrogram_to_buf(mels[idx].detach().cpu().numpy().T))
+            self.writer.add_image(name, ToTensor()(img))
+            audio = get_wav(mels[idx].transpose(0, 1).unsqueeze(0),
+                            self.waveglow, sampling_rate=16000)
+            self.writer.add_audio(name, audio, sample_rate=16000)
 
     def _log_spectrogram(self, spectrogram_batch):
         spectrogram = random.choice(spectrogram_batch.cpu())
