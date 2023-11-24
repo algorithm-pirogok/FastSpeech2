@@ -52,12 +52,6 @@ class Trainer(BaseTrainer):
         self.lr_scheduler = lr_scheduler
         self.log_step = 100
 
-        self.train_metrics = MetricTracker(
-            "loss", "grad norm", *[m.name for m in self._metrics_train], writer=self.writer
-        )
-        self.evaluation_metrics = MetricTracker(
-            "loss", *[m.name for m in self._metrics_test], writer=self.writer
-        )
         self.metrics = ["loss", "mel_loss", "duration_predictor_loss", "energy_predictor_loss", "pitch_predictor_loss"]
         self.train_metrics = MetricTracker(
             "grad norm", *self.metrics, writer=self.writer
@@ -95,7 +89,7 @@ class Trainer(BaseTrainer):
                 tqdm(self.train_dataloader, desc="train", total=self.len_epoch)
         ):
             for iter_batch_idx, batch in enumerate(list_batch):
-                batch_idx = list_batch_idx * self.len_epoch + iter_batch_idx
+                batch_idx = list_batch_idx * 32 + iter_batch_idx
                 try:
                     batch = self.process_batch(
                         batch,
@@ -165,7 +159,7 @@ class Trainer(BaseTrainer):
 
         for loss_name in ("loss", "mel_loss", "duration_predictor_loss", "energy_predictor_loss",
                           "pitch_predictor_loss"):
-            metrics.update(loss_name, batch[loss_name].item())
+            metrics.update(loss_name, batch[loss_name])
         return batch
 
     def _progress(self, batch_idx):
