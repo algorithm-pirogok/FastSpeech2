@@ -4,6 +4,7 @@ editdistance
 kenlm
 hydra-core
 inflect
+gdown
 matplotlib
 numpy
 jupyter
