@@ -95,7 +95,8 @@ class Trainer(BaseTrainer):
         for list_batch_idx, list_batch in enumerate(
                 tqdm(self.train_dataloader, desc="train", total=self.len_epoch)
         ):
-            for batch_idx, batch in enumerate(list_batch):
+            for iter_batch_idx, batch in enumerate(list_batch):
+                batch_idx = list_batch_idx * self.len_epoch + iter_batch_idx
                 try:
                     batch = self.process_batch(
                         batch,
@@ -113,8 +114,7 @@ class Trainer(BaseTrainer):
                         continue
                     else:
                         raise e
-                if not (batch_idx + 1) % self.config['trainer']['batch_acum']:
-                    self.train_metrics.update("grad norm", self.get_grad_norm())
+                self.train_metrics.update("grad norm", self.get_grad_norm())
                 if batch_idx % self.log_step == 0:
                     print("BATCH_IDX", batch_idx)
                     self.writer.set_step((epoch - 1) * self.len_epoch + batch_idx)
@@ -126,7 +126,6 @@ class Trainer(BaseTrainer):
                     self.writer.add_scalar(
                         "learning rate", self.optimizer.param_groups[0]['lr']
                     )
-                    # self._log_predictions(is_validation=False, **batch)
                     self._log(batch['mel_target'], 'target')
                     self._log(batch['output'], 'prediction')
                     self._log_scalars(self.train_metrics)
@@ -161,16 +160,15 @@ class Trainer(BaseTrainer):
         batch["duration_predictor_loss"] = duration_predictor_loss
         batch["energy_predictor_loss"] = energy_predictor_loss
         batch["pitch_predictor_loss"] = pitch_predictor_loss
-        if is_train and not ((batch_idx + 1) % self.config['trainer']['batch_acum']):
+        if is_train:
             batch["loss"].backward()
             self._clip_grad_norm()
             self.optimizer.step()
             self.lr_scheduler.step()  # fix
 
-        if not is_train or ((batch_idx + 1) % self.config['trainer']['batch_acum']):
-            for loss_name in ("loss", "mel_loss", "duration_predictor_loss", "energy_predictor_loss",
-                              "pitch_predictor_loss"):
-                metrics.update(loss_name, batch[loss_name].item())
+        for loss_name in ("loss", "mel_loss", "duration_predictor_loss", "energy_predictor_loss",
+                          "pitch_predictor_loss"):
+            metrics.update(loss_name, batch[loss_name].item())
         return batch
 
     def _evaluation_epoch(self, epoch, dataloader):
