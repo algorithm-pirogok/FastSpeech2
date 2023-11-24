@@ -201,5 +201,4 @@ class Trainer(BaseTrainer):
         if self.writer is None:
             return
         for metric_name in metric_tracker.keys():
-            print(f"{metric_name}", metric_tracker.avg(metric_name))
             self.writer.add_scalar(f"{metric_name}", metric_tracker.avg(metric_name))

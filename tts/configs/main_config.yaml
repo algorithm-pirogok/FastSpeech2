@@ -10,5 +10,5 @@ defaults:
   - optimizer: AdamW
 
 name: base_config
-n_gpu: 1
+n_gpu: 4
 checkpoint:
