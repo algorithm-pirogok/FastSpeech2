@@ -147,6 +147,7 @@ class Trainer(BaseTrainer):
             batch['energy_target'], batch['pitch_target'])
 
         batch["loss"] = (mel_loss + duration_predictor_loss + energy_predictor_loss + pitch_predictor_loss) / 4
+        batch["loss"] = duration_predictor_loss
         batch["mel_loss"] = mel_loss
         batch["duration_predictor_loss"] = duration_predictor_loss
         batch["energy_predictor_loss"] = energy_predictor_loss
@@ -179,7 +180,6 @@ class Trainer(BaseTrainer):
         audio = get_wav(mels[idx].transpose(0, 1).unsqueeze(0),
                         self.waveglow, sampling_rate=16000)
         self.writer.add_audio(name, audio, sample_rate=16000)
-
 
     @torch.no_grad()
     def get_grad_norm(self, norm_type=2):
