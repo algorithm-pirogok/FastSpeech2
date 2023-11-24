@@ -1,0 +1,5 @@
+_target_: tts.loss.FinalLoss
+alpha: 0.8
+beta: 0.1
+gamma: 0.5
+eps: 1e-5

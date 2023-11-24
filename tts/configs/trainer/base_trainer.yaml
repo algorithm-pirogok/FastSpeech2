@@ -1,0 +1,13 @@
+epochs: 500
+save_dir: saved/
+save_period: 1
+verbosity: 2
+monitor: min val_loss
+early_stop: 100
+visualize: wandb
+wandb_project: tts_homework
+wandb_name: model_base
+wandb_entity: wandb_pirogok
+len_epoch: 1500
+batch_acum: 1
+grad_norm_clip: 10

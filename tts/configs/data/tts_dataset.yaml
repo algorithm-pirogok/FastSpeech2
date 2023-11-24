@@ -1,0 +1,11 @@
+batch_size: 16
+batch_expand_size: 32
+num_workers: 0
+
+datasets:
+  - _target_: tts.datasets.BufferDataset
+    alignment_path: "data/alignments"
+    batch_expand_size: 32
+    data_path: 'data/train.txt'
+    mel_ground_truth: 'data/mels'
+    text_cleaners: [ 'english_cleaners' ]

@@ -1,0 +1,26 @@
+_target_: tts.model.SpEx
+n_feats: 32
+n_class: 100
+encoder_params:
+  out_channels: 64
+  L1: 20
+  L2: 80
+  L3: 160
+
+norm_params:
+  unlinear: ReLU
+  out_channels: 32
+
+tcn_params:
+  spk_embed_dim: 32
+  conv_channels: 64
+  kernel_size: 3
+  len_of_tcn_chain: 3
+  count_of_tch: 2
+
+
+resnet_count: 3
+
+final_params:
+  unlinear: ReLU
+  out_channels: 32

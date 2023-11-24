@@ -1,13 +1,13 @@
 defaults:
-  - arch: base_arch
+  - arch: tts2_arch
   # - augmentations: base_augmentations
-  - data: base_dataset
-  - loss: base_loss
+  - data: tts_dataset
+  - loss: tts_loss
   - lr_scheduler: LRStep
   - metrics: base_metrics
   - preprocessing: base_preprocessing
   - trainer: base_trainer
-  - optimizer: Adam
+  - optimizer: AdamW
 
 name: base_config
 n_gpu: 1

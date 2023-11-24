@@ -1,4 +1,4 @@
-_target_: tts.model.FastSpeech
+_target_: tts.model.FastSpeech2
 
 coder_config:
   dropout: 0.1
@@ -14,10 +14,22 @@ coder_config:
 
 
 regulator_config:
-  duration_predictor_filter_size: 256
-  duration_predictor_kernel_size: 3
+  predictor_filter_size: 256
+  predictor_kernel_size: 3
   dropout: 0.1
 
+
+energy_config:
+  min_bucket: 15
+  max_bucket: 91
+  buckets: 256
+  alpha: 1.0
+
+pitch_config:
+  min_bucket: 60
+  max_bucket: 887
+  buckets: 256
+  alpha: 1.0
 
 device: 'cpu'
 max_seq_len: 3000

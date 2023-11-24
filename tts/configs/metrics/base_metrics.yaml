@@ -1,0 +1,23 @@
+- _target_: tts.metric.SISDRMetric
+  name: SI-SDR Metric
+  train: true
+  zero_mean: false
+  comb: false
+
+- _target_: tts.metric.SISDRMetric
+  name: Comb SI-SDR Metric
+  train: true
+  zero_mean: false
+  comb: true
+
+- _target_: tts.metric.CEMetric
+  name: CE Metric
+  train: true
+
+- _target_: tts.metric.PESQMetric
+  name: PESQ Metric
+  train: false
+  fs: 16000
+  mode: wb
+  n_processes: 8
+

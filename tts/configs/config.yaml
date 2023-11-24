@@ -1,0 +1,13 @@
+defaults:
+  - arch: base_arch
+  - data: base_dataset
+  - loss: base_loss
+  - lr_scheduler: LRStep
+  - metrics: base_metrics
+  - preprocessing: base_preprocessing
+  - trainer: base_trainer
+  - optimizer: Adam
+
+name: base_config
+n_gpu: 1
+checkpoint:
