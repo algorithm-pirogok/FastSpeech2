@@ -39,7 +39,6 @@ class Trainer(BaseTrainer):
         super().__init__(model, criterion, metrics_train, metrics_test, optimizer, config, device)
         self.skip_oom = skip_oom
         self.config = config
-        # todo
         self.waveglow = glow
         self.train_dataloader = dataloader
         if len_epoch is None:
@@ -135,9 +134,6 @@ class Trainer(BaseTrainer):
                     break
         log = last_train_metrics
 
-        val_log = self._evaluation_epoch(epoch, self.evaluation_dataloader)
-        log.update(**{f"evaluation": value for name, value in val_log.items()})
-
         return log
 
     def process_batch(self, batch, batch_idx: int, is_train: bool, metrics: MetricTracker):
@@ -165,54 +161,12 @@ class Trainer(BaseTrainer):
             batch["loss"].backward()
             self._clip_grad_norm()
             self.optimizer.step()
-            self.lr_scheduler.step()  # fix
+            self.lr_scheduler.step()
 
         for loss_name in ("loss", "mel_loss", "duration_predictor_loss", "energy_predictor_loss",
                           "pitch_predictor_loss"):
             metrics.update(loss_name, batch[loss_name].item())
         return batch
-
-    def _evaluation_epoch(self, epoch, dataloader):
-        """
-        Validate after training an epoch
-
-        :param epoch: Integer, current training epoch.
-        :return: A log that contains information about validation
-        """
-        self.model.eval()
-        self.evaluation_metrics.reset()
-        with torch.no_grad():
-            for batch_idx, batch in tqdm(
-                    enumerate(dataloader),
-                    desc="evaluation",
-                    total=len(dataloader),
-            ):
-                batch = self.process_batch(
-                    batch,
-                    batch_idx=batch_idx,
-                    is_train=False,
-                    metrics=self.evaluation_metrics,
-                )
-
-            self.writer.set_step(epoch * self.len_epoch, "evaluation")
-            # todo add log audio and spectrograms
-            """self._log_audio(batch['mixed'][0],
-                            batch['short'][0],
-                            batch['long'][0],
-                            batch['target'][0],
-                            batch['ref'][0],
-                            16000)"""
-            self._log_scalars(self.evaluation_metrics)
-
-            torch.save(self.model.state_dict(), ROOT_PATH / f"outputs/{epoch}.pth")
-
-            # self._log_predictions(is_validation=True, **batch)
-            # self._log_spectrogram(batch["spectrogram"])
-
-        # add histogram of model parameters to the tensorboard
-        for name, p in self.model.named_parameters():
-            self.writer.add_histogram(name, p, bins="auto")
-        return self.evaluation_metrics.result()
 
     def _progress(self, batch_idx):
         base = "[{}/{} ({:.0f}%)]"
