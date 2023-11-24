@@ -11,6 +11,8 @@ import torch
 from tts.trainer import Trainer
 from tts.utils import prepare_device, get_logger
 from tts.utils.object_loading import get_dataloaders
+from tts.utils.util import load_waveglow
+
 
 # Отключение предупреждений
 warnings.simplefilter("ignore", UserWarning)
@@ -56,6 +58,7 @@ def main(clf: DictConfig):
         optimizer,
         config=clf,
         device=device,
+        glow=load_waveglow("waveglow/pretrained_model/waveglow_256channels.pt", device),
         dataloader=dataloader,
         lr_scheduler=lr_scheduler,
         len_epoch=clf["trainer"].get("len_epoch", None)
