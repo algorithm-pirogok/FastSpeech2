@@ -64,7 +64,7 @@ class Trainer(BaseTrainer):
         Move all necessary tensors to the HPU
         """
         names = ["length_target", "mel_target", "mel_pos", "src_seq",
-                 "src_pos"]
+                 "src_pos", "pitch_target", "energy_target"]
         for tensor_for_gpu in names:
             batch[tensor_for_gpu] = batch[tensor_for_gpu].to(device)
         return batch
