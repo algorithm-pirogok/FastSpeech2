@@ -18,7 +18,7 @@ class BaseDataset(Dataset):
         self.buffer = self._get_buffer(*args, **kwargs)
         self.length_dataset = len(self.buffer)
 
-    def _get_buffer(self, data_path, batch_expand_size, mel_ground_truth, alignment_path, text_cleaners, size = 2000):
+    def _get_buffer(self, data_path, batch_expand_size, mel_ground_truth, alignment_path, text_cleaners, size=99000):
         buffer = list()
         text = self._process_text(data_path)
 
@@ -37,7 +37,7 @@ class BaseDataset(Dataset):
                 energy_path, "ljspeech-energy-%05d.npy" % (i + 1)
             ))
             pitch = np.load(os.path.join(
-                pitch_path, "ljspeech-pitch-%05d.npy" % (i+1)
+                pitch_path, "ljspeech-pitch-%05d.npy" % (i + 1)
             ))
             character = text[i][0:len(text[i]) - 1]
 
