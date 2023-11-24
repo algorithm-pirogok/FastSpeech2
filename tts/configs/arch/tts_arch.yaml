@@ -19,7 +19,7 @@ regulator_config:
   dropout: 0.1
 
 
-device: 'cpu'
+device: 'cuda'
 max_seq_len: 3000
 num_mels: 80
 PAD: 0
