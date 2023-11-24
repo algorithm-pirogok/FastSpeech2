@@ -1,4 +1,4 @@
-epochs: 500
+epochs: 20
 save_dir: saved/
 save_period: 1
 verbosity: 2
@@ -8,6 +8,7 @@ visualize: wandb
 wandb_project: tts_homework
 wandb_name: model_base
 wandb_entity: wandb_pirogok
-len_epoch: 1500
+len_epoch: 5000
 batch_acum: 1
+log_step: 100
 grad_norm_clip: 10
