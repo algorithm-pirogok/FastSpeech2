@@ -12,9 +12,12 @@ from tts.trainer import Trainer
 from tts.utils import prepare_device, get_logger
 from tts.utils.object_loading import get_dataloaders
 
+from tts.utils.util import ROOT_PATH
+
 
 def load_waveglow(path, device):
-    waveglow = torch.load(path, map_location=device)["model"].to(device).eval().remove_weightnorm(waveglow)
+    waveglow = torch.load(ROOT_PATH / path, map_location=device)["model"].to(device).eval()
+    waveglow = waveglow.remove_weightnorm(waveglow)
     for module in waveglow.modules():
         if "Conv" in str(type(module)):
             setattr(module, "padding_mode", "zeros")
